@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS songs;
+DROP TABLE IF EXISTS music_library.songs;

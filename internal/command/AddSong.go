@@ -28,20 +28,23 @@ func (h *Handlers) AddSong(w http.ResponseWriter, r *http.Request) {
 	songDetail, err := h.MusicClient.GetSongInfo(song.Group, song.Song)
 	if err != nil {
 		log.Printf("Failed to get song info from external API: %v", err)
-		http.Error(w, "Failed to enrich song data", http.StatusInternalServerError)
-		return
+		log.Println("Proceeding with partial song data")
+	} else {
+		song.ReleaseDate = songDetail.ReleaseDate
+		song.Text = songDetail.Text
+		song.Link = songDetail.Link
+		log.Printf("Song info enriched: ReleaseDate=%s, Text=%s, Link=%s",
+			songDetail.ReleaseDate, songDetail.Text, songDetail.Link)
 	}
-
-	song.ReleaseDate = songDetail.ReleaseDate
-	song.Text = songDetail.Text
-	song.Link = songDetail.Link
 
 	query := "INSERT INTO songs (group_name, song_name, release_date, text, link, created_at) VALUES ($1, $2, $3, $4, $5)"
 	_, err = h.DB.Exec(query, song.Group, song.Song, song.ReleaseDate, song.Text, song.Link, time.Now())
 	if err != nil {
+		log.Printf("Failed to save song in the database: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	log.Printf("[INFO] Song added successfully: Group=%s, Song=%s", song.Group, song.Song)
 
 	w.WriteHeader(http.StatusCreated)
 }

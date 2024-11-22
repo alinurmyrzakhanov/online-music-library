@@ -18,7 +18,7 @@ func main() {
 		log.Fatalf("could not connect to the database: %v", err)
 	}
 
-	musicClient := clients.NewMusicInfoClient("http://external-music-info-service.com")
+	musicClient := clients.NewMusicInfoClient(cfg.MusicAPI)
 
 	srv := server.NewServer(db, musicClient)
 	log.Println("Starting server on :8080")

@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS music_library;
+
 CREATE TABLE IF NOT EXISTS songs (
     id SERIAL PRIMARY KEY,
     group_name VARCHAR(255) NOT NULL,
